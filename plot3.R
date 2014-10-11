@@ -1,32 +1,19 @@
-## Set local time and language:
-Sys.setlocale("LC_TIME", "English")
+## Load data
+source('load.R')
 
-## Read the dataset:
-d <- read.table("household_power_consumption.txt", sep=";", header=T, colClasses=c("character", "character", rep("numeric", 7)), na.strings="?")
-
-## Convert the date column to Date class:
-d$Date <- as.Date(d$Date, format="%d/%m/%Y")
-
-## Subset the data.frame to include only the desired dates:
-d <- d[d$Date >= as.Date("2007-02-01") & d$Date<=as.Date("2007-02-02"),]
-
-## Convert Date and Time columns to POSIXlt class:
-d$Date <- as.POSIXlt(paste(as.Date(d$Date, format="%d/%m/%Y"), d$Time, sep=" "))
-
-## Start a PNG device and plot submeterings vs. time:
+## Start a PNG device
 png("plot3.png", width=480, height=480)
-par(mar=c(4.7, 4.7, 0.7, 0.7))
 
-plot(d$Date, d$Sub_metering_1, type="n", lwd=1, 
-     ylim=c(0, max(c(d$Sub_metering_1, d$Sub_metering_2, d$Sub_metering_3))),
-     xlab="", ylab="Energy sub metering")
+## Plot the submeterings vs. time
+plot(power.df$date.time, power.df$Sub_metering_1, type='l',
+     xlab='', ylab='Energy sub metering')
+lines(power.df$date.time, power.df$Sub_metering_2, col='red')
+lines(power.df$date.time, power.df$Sub_metering_3, col='blue')
 
-lines(d$Date, d$Sub_metering_1, col="black")
-lines(d$Date, d$Sub_metering_2, col="red")
-lines(d$Date, d$Sub_metering_3, col="blue")
+legend('topright', 
+       legend=c('Sub_metering_1', 'Sub_metering_2', 'Sub_metering_3'),
+       col=c('black', 'red', 'blue'), 
+       lty='solid')
 
-legend("topright", lwd=1, 
-       col=c("black", "red", "blue"), 
-       legend=c("Sub_metering_1", "Sub_metering_2", "Sub_metering_3"))
-
+## Turn off device
 dev.off()
